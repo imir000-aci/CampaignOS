@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Test Form B — autofill</title>
+    <style>
+      body { font-family: system-ui, sans-serif; max-width: 560px; margin: 40px auto; }
+      fieldset { margin: 14px 0; }
+      label { display: block; margin: 8px 0 3px; font-weight: 600; }
+      input[type='text'], input[type='email'], input[type='url'], input[type='date'],
+      input[type='number'], select, textarea { width: 100%; padding: 7px; }
+      .opt { font-weight: 400; display: inline-block; margin-right: 14px; }
+    </style>
+  </head>
+  <body>
+    <h1>Form B — reload after filling Form A to see autofill</h1>
+    <p>
+      Some labels are identical to Form A (exact match), others are reworded (fuzzy /
+      AI match).
+    </p>
+    <form>
+      <!-- exact -->
+      <label for="email">Email address</label>
+      <input type="email" id="email" name="email" />
+
+      <!-- reworded: "Full name" -> "Your name" -->
+      <label for="name">Your name</label>
+      <input type="text" id="name" name="name" />
+
+      <!-- reworded: "Website URL" -> "Personal website" -->
+      <label for="site">Personal website</label>
+      <input type="url" id="site" name="site" />
+
+      <!-- exact -->
+      <label for="dob">Date of birth</label>
+      <input type="date" id="dob" name="dob" />
+
+      <!-- reworded: "Country" -> "Which country do you live in?" -->
+      <label for="country2">Which country do you live in?</label>
+      <select id="country2" name="country2">
+        <option value="">Select…</option>
+        <option value="us">United States</option>
+        <option value="ca">Canada</option>
+        <option value="gb">United Kingdom</option>
+      </select>
+
+      <fieldset>
+        <legend>How should we contact you?</legend>
+        <label class="opt"><input type="radio" name="contactpref" value="email" /> Email</label>
+        <label class="opt"><input type="radio" name="contactpref" value="phone" /> Phone</label>
+        <label class="opt"><input type="radio" name="contactpref" value="sms" /> SMS</label>
+      </fieldset>
+
+      <!-- reworded: "Tell us about yourself" -> "Short bio" -->
+      <label for="about">Short bio</label>
+      <textarea id="about" name="about" rows="4"></textarea>
+
+      <p><button type="button">Submit (no-op)</button></p>
+    </form>
+  </body>
+</html>

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Test Form A — capture</title>
+    <style>
+      body { font-family: system-ui, sans-serif; max-width: 560px; margin: 40px auto; }
+      fieldset { margin: 14px 0; }
+      label { display: block; margin: 8px 0 3px; font-weight: 600; }
+      input[type='text'], input[type='email'], input[type='url'], input[type='date'],
+      input[type='number'], select, textarea { width: 100%; padding: 7px; }
+      .opt { font-weight: 400; display: inline-block; margin-right: 14px; }
+    </style>
+  </head>
+  <body>
+    <h1>Form A — fill this in, then open Form B</h1>
+    <form>
+      <label for="fullname">Full name</label>
+      <input type="text" id="fullname" name="fullname" />
+
+      <label for="email">Email address</label>
+      <input type="email" id="email" name="email" />
+
+      <label for="website">Website URL</label>
+      <input type="url" id="website" name="website" />
+
+      <label for="dob">Date of birth</label>
+      <input type="date" id="dob" name="dob" />
+
+      <label for="years">Years of experience</label>
+      <input type="number" id="years" name="years" />
+
+      <label for="country">Country</label>
+      <select id="country" name="country">
+        <option value="">Select…</option>
+        <option value="us">United States</option>
+        <option value="ca">Canada</option>
+        <option value="gb">United Kingdom</option>
+      </select>
+
+      <fieldset>
+        <legend>Preferred contact method</legend>
+        <label class="opt"><input type="radio" name="contact" value="email" /> Email</label>
+        <label class="opt"><input type="radio" name="contact" value="phone" /> Phone</label>
+        <label class="opt"><input type="radio" name="contact" value="sms" /> SMS</label>
+      </fieldset>
+
+      <label><input type="checkbox" name="newsletter" /> Subscribe to the newsletter</label>
+
+      <label for="bio">Tell us about yourself</label>
+      <textarea id="bio" name="bio" rows="4"></textarea>
+
+      <p><button type="button">Submit (no-op)</button></p>
+    </form>
+  </body>
+</html>
