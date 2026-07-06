@@ -1,0 +1,3 @@
+{
+  "content": "{\"dimension_scores\": {\"kpi_coverage\": 4, \"attribution_soundness\": 4, \"tracking_feasibility\": 4, \"anomaly_coverage\": 4}, \"blocking_issues\": [], \"improvement_suggestions\": [], \"overall_score\": 4.0}"
+}
