@@ -1,0 +1,21 @@
+{
+  "name": "@campaignos/neo4j-client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "neo4j-driver": "^5.27.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  },
+  "peerDependencies": {
+    "typescript": "^5.7.2"
+  }
+}

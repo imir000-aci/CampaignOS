@@ -1,0 +1,38 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: "otel-collector"
+    static_configs:
+      - targets: ["otel-collector:8888"]
+
+  - job_name: "campaignos-services"
+    static_configs:
+      - targets:
+          - "strategy-platform:3010"
+          - "audience-platform:3020"
+          - "targeting-platform:3030"
+          - "experience-platform:3040"
+          - "experiment-platform:3050"
+          - "measurement-platform:3060"
+          - "recommendation-platform:3070"
+          - "offer-platform:3080"
+          - "bundle-platform:3090"
+          - "creative-asset-platform:3100"
+          - "semantic-layer-platform:3110"
+          - "activation-platform:3120"
+          - "auth-service:3200"
+          - "supervisor-agent:4000"
+          - "temporal-worker:4100"
+    metrics_path: /metrics
+    scrape_interval: 30s
+
+  - job_name: "redpanda"
+    static_configs:
+      - targets: ["redpanda:9644"]
+
+  - job_name: "temporal"
+    static_configs:
+      - targets: ["temporal:7233"]
+    metrics_path: /metrics
