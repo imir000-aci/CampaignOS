@@ -66,6 +66,9 @@ class SupervisorState(TypedDict, total=False):
     # Accumulated agent outputs (key = agent name)
     agent_outputs: dict[str, Any]
 
+    # Per-agent cost tracking: {"strategy": {"tokens_used": 120, "estimated_cost_usd": 0.03}, ...}
+    agent_costs: dict[str, Any]
+
     # Execution tracking
     current_step: str
     strategy_iterations: int
@@ -95,6 +98,7 @@ def _default_state(campaign_id: str, brief: dict[str, Any], stub_mode: bool = Fa
         brief=brief,
         stub_mode=stub_mode,
         agent_outputs={},
+        agent_costs={},
         current_step="INITIALIZING",
         strategy_iterations=0,
         gate1_approved=None,
@@ -129,10 +133,11 @@ def _agent_input(state: SupervisorState) -> AgentInput:
     )
 
 
-def _run_agent_sync(agent_cls, state: SupervisorState) -> dict[str, Any]:
-    """Instantiate agent, run synchronously, return output dict."""
+def _run_agent(agent_cls, state: SupervisorState) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Instantiate agent, run synchronously; return (output_dict, cost_dict)."""
     result = agent_cls().run(_agent_input(state))
-    return result.output
+    cost = {"tokens_used": result.tokens_used, "estimated_cost_usd": result.estimated_cost_usd}
+    return result.output, cost
 
 
 # ---------------------------------------------------------------------------
@@ -141,9 +146,10 @@ def _run_agent_sync(agent_cls, state: SupervisorState) -> dict[str, Any]:
 
 def node_run_strategy(state: SupervisorState) -> dict:
     logger.info("step=strategy campaign_id=%s", state["campaign_id"])
-    output = _run_agent_sync(StrategyAgent, state)
+    output, cost = _run_agent(StrategyAgent, state)
     return {
         "agent_outputs": {**state.get("agent_outputs", {}), "strategy": output},
+        "agent_costs": {**state.get("agent_costs", {}), "strategy": cost},
         "current_step": "STRATEGY_COMPLETE",
         "strategy_iterations": state.get("strategy_iterations", 0) + 1,
     }
@@ -172,9 +178,10 @@ def node_strategy_gate(state: SupervisorState) -> dict:
 
 def node_run_audience(state: SupervisorState) -> dict:
     logger.info("step=audience campaign_id=%s", state["campaign_id"])
-    output = _run_agent_sync(AudienceAgent, state)
+    output, cost = _run_agent(AudienceAgent, state)
     return {
         "agent_outputs": {**state.get("agent_outputs", {}), "audience": output},
+        "agent_costs": {**state.get("agent_costs", {}), "audience": cost},
         "current_step": "AUDIENCE_COMPLETE",
     }
 
@@ -184,8 +191,8 @@ def node_run_creative_targeting_parallel(state: SupervisorState) -> dict:
     logger.info("step=creative+targeting_parallel campaign_id=%s", state["campaign_id"])
 
     # Run synchronously — both agents share read-only input so no race condition
-    creative_output = _run_agent_sync(CreativeAgent, state)
-    targeting_output = _run_agent_sync(TargetingAgent, state)
+    creative_output, creative_cost = _run_agent(CreativeAgent, state)
+    targeting_output, targeting_cost = _run_agent(TargetingAgent, state)
 
     return {
         "agent_outputs": {
@@ -193,15 +200,21 @@ def node_run_creative_targeting_parallel(state: SupervisorState) -> dict:
             "creative": creative_output,
             "targeting": targeting_output,
         },
+        "agent_costs": {
+            **state.get("agent_costs", {}),
+            "creative": creative_cost,
+            "targeting": targeting_cost,
+        },
         "current_step": "PARALLEL_1_COMPLETE",
     }
 
 
 def node_run_experience(state: SupervisorState) -> dict:
     logger.info("step=experience campaign_id=%s", state["campaign_id"])
-    output = _run_agent_sync(ExperienceAgent, state)
+    output, cost = _run_agent(ExperienceAgent, state)
     return {
         "agent_outputs": {**state.get("agent_outputs", {}), "experience": output},
+        "agent_costs": {**state.get("agent_costs", {}), "experience": cost},
         "current_step": "EXPERIENCE_COMPLETE",
     }
 
@@ -210,8 +223,8 @@ def node_run_experiment_measurement_parallel(state: SupervisorState) -> dict:
     """Run ExperimentAgent and MeasurementAgent concurrently."""
     logger.info("step=experiment+measurement_parallel campaign_id=%s", state["campaign_id"])
 
-    experiment_output = _run_agent_sync(ExperimentAgent, state)
-    measurement_output = _run_agent_sync(MeasurementAgent, state)
+    experiment_output, experiment_cost = _run_agent(ExperimentAgent, state)
+    measurement_output, measurement_cost = _run_agent(MeasurementAgent, state)
 
     return {
         "agent_outputs": {
@@ -219,24 +232,31 @@ def node_run_experiment_measurement_parallel(state: SupervisorState) -> dict:
             "experiment": experiment_output,
             "measurement": measurement_output,
         },
+        "agent_costs": {
+            **state.get("agent_costs", {}),
+            "experiment": experiment_cost,
+            "measurement": measurement_cost,
+        },
         "current_step": "PARALLEL_2_COMPLETE",
     }
 
 
 def node_run_validation(state: SupervisorState) -> dict:
     logger.info("step=validation campaign_id=%s", state["campaign_id"])
-    output = _run_agent_sync(ValidationAgent, state)
+    output, cost = _run_agent(ValidationAgent, state)
     return {
         "agent_outputs": {**state.get("agent_outputs", {}), "validation": output},
+        "agent_costs": {**state.get("agent_costs", {}), "validation": cost},
         "current_step": "VALIDATION_COMPLETE",
     }
 
 
 def node_run_preview(state: SupervisorState) -> dict:
     logger.info("step=preview campaign_id=%s", state["campaign_id"])
-    output = _run_agent_sync(PreviewAgent, state)
+    output, cost = _run_agent(PreviewAgent, state)
     return {
         "agent_outputs": {**state.get("agent_outputs", {}), "preview": output},
+        "agent_costs": {**state.get("agent_costs", {}), "preview": cost},
         "current_step": "PREVIEW_COMPLETE",
     }
 

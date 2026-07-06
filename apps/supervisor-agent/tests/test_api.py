@@ -256,3 +256,11 @@ async def test_get_cost_returns_structure(client):
     assert "estimated_cost_usd" in data
     assert "agents_completed" in data
     assert isinstance(data["agents_completed"], list)
+    assert "per_agent_costs" in data
+    assert isinstance(data["per_agent_costs"], dict)
+
+
+@pytest.mark.asyncio
+async def test_get_cost_not_found(client):
+    resp = await client.get("/agents/runs/nonexistent-cost-id/cost")
+    assert resp.status_code == 404

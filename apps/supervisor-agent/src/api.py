@@ -125,10 +125,19 @@ async def _resume_pipeline(run: AgentRun, resume_value: dict, store: RunStore) -
         await store.emit_done(run)
 
 
+def _compute_cost_totals(agent_costs: dict) -> tuple[int, float]:
+    """Sum tokens_used and estimated_cost_usd across all completed agents."""
+    total_tokens = sum(c.get("tokens_used", 0) for c in agent_costs.values())
+    total_cost = sum(c.get("estimated_cost_usd", 0.0) for c in agent_costs.values())
+    return total_tokens, round(total_cost, 6)
+
+
 async def _sync_run_from_state(run: AgentRun, state: dict, store: RunStore) -> None:
     """Update the run record from a returned LangGraph state."""
     agent_outputs = state.get("agent_outputs", {})
     current_step = state.get("current_step", "")
+    agent_costs = state.get("agent_costs", {})
+    total_tokens, total_cost = _compute_cost_totals(agent_costs)
 
     # Determine new status
     if "__interrupt__" in state:
@@ -146,6 +155,9 @@ async def _sync_run_from_state(run: AgentRun, state: dict, store: RunStore) -> N
             run,
             status=new_status,
             agent_outputs=agent_outputs,
+            agent_costs=agent_costs,
+            tokens_used=total_tokens,
+            estimated_cost_usd=total_cost,
             current_step=current_step,
             pending_approval=pending,
         )
@@ -155,6 +167,9 @@ async def _sync_run_from_state(run: AgentRun, state: dict, store: RunStore) -> N
             run,
             status=RunStatus.COMPLETED,
             agent_outputs=agent_outputs,
+            agent_costs=agent_costs,
+            tokens_used=total_tokens,
+            estimated_cost_usd=total_cost,
             current_step=current_step,
             completed_at=time.time(),
             gate1_approved=state.get("gate1_approved"),
@@ -166,6 +181,9 @@ async def _sync_run_from_state(run: AgentRun, state: dict, store: RunStore) -> N
             run,
             status=RunStatus.REJECTED,
             agent_outputs=agent_outputs,
+            agent_costs=agent_costs,
+            tokens_used=total_tokens,
+            estimated_cost_usd=total_cost,
             current_step=current_step,
             completed_at=time.time(),
             gate1_approved=state.get("gate1_approved"),
@@ -177,6 +195,9 @@ async def _sync_run_from_state(run: AgentRun, state: dict, store: RunStore) -> N
             run,
             status=RunStatus.VALIDATION_FAILED,
             agent_outputs=agent_outputs,
+            agent_costs=agent_costs,
+            tokens_used=total_tokens,
+            estimated_cost_usd=total_cost,
             current_step=current_step,
             completed_at=time.time(),
         )
@@ -186,13 +207,23 @@ async def _sync_run_from_state(run: AgentRun, state: dict, store: RunStore) -> N
             run,
             status=RunStatus.ESCALATED,
             agent_outputs=agent_outputs,
+            agent_costs=agent_costs,
+            tokens_used=total_tokens,
+            estimated_cost_usd=total_cost,
             current_step=current_step,
             completed_at=time.time(),
         )
         await store.emit_event(run, "escalated", {})
     else:
         # In-progress state update
-        await store.update(run, agent_outputs=agent_outputs, current_step=current_step)
+        await store.update(
+            run,
+            agent_outputs=agent_outputs,
+            agent_costs=agent_costs,
+            tokens_used=total_tokens,
+            estimated_cost_usd=total_cost,
+            current_step=current_step,
+        )
         await store.emit_event(run, "step_completed", {"current_step": current_step})
 
 
@@ -366,7 +397,7 @@ async def reject_run(
 
 @app.get("/agents/runs/{run_id}/cost")
 async def get_run_cost(run_id: str) -> dict:
-    """Return token usage and estimated cost for this run."""
+    """Return token usage and estimated cost for this run, including per-agent breakdown."""
     run = run_store.get(run_id)
     if not run:
         raise HTTPException(status_code=404, detail="Run not found")
@@ -375,4 +406,5 @@ async def get_run_cost(run_id: str) -> dict:
         "tokens_used": run.tokens_used,
         "estimated_cost_usd": run.estimated_cost_usd,
         "agents_completed": list(run.agent_outputs.keys()),
+        "per_agent_costs": run.agent_costs,
     }

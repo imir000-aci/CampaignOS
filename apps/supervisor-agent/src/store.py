@@ -43,6 +43,8 @@ class AgentRun:
     thread_id: str  # LangGraph checkpointer thread ID
     status: RunStatus
     agent_outputs: dict[str, Any] = field(default_factory=dict)
+    # Per-agent cost breakdown: {"strategy": {"tokens_used": 120, "estimated_cost_usd": 0.03}}
+    agent_costs: dict[str, Any] = field(default_factory=dict)
     current_step: str = "INITIALIZING"
     pending_approval: ApprovalRequest | None = None
     gate1_approved: bool | None = None
@@ -70,6 +72,7 @@ class AgentRun:
             "completed_at": self.completed_at,
             "estimated_cost_usd": self.estimated_cost_usd,
             "tokens_used": self.tokens_used,
+            "agent_costs": self.agent_costs,
         }
 
     def approval_request_dict(self) -> dict[str, Any] | None:
