@@ -1,0 +1,60 @@
+{
+  "objective": "Increase average basket size by 15% among active Southwest loyalty members purchasing grilling-related products (beef, pork, seafood, marinades, charcoal) between June 1 and August 31, 2026.",
+  "channel_mix": {
+    "channels": ["EMAIL", "PAID_SOCIAL"],
+    "primary_channel": "EMAIL",
+    "channel_allocation": {
+      "EMAIL": 0.55,
+      "PAID_SOCIAL": 0.45
+    }
+  },
+  "target_market": {
+    "description": "Active Vons/Albertsons loyalty members in the Southwest and Pacific divisions who have purchased any grilling-related product in the past 12 months, with household size 2+, outdoor lifestyle indicators, and digital enrollment.",
+    "segments": ["grilling_enthusiasts", "loyalty_active_southwest", "outdoor_lifestyle"],
+    "geography": "Southwest + Pacific — top 500 stores",
+    "age_bands": ["25-34", "35-44", "45-54"]
+  },
+  "messaging_pillars": [
+    "Summer's best meals start with the best ingredients — our premium cuts at unbeatable prices",
+    "Exclusive loyalty member savings on everything you need for the perfect backyard cookout",
+    "From the grill to the table in under 30 minutes — chef-quality seafood and beef made easy"
+  ],
+  "kpi_targets": [
+    {
+      "metric_name": "basket_size_uplift_pct",
+      "target_value": 15.0,
+      "measurement_window_days": 90,
+      "attribution_model": "LAST_TOUCH"
+    },
+    {
+      "metric_name": "email_click_through_rate",
+      "target_value": 3.2,
+      "measurement_window_days": 7,
+      "attribution_model": "LAST_TOUCH"
+    },
+    {
+      "metric_name": "paid_social_roas",
+      "target_value": 4.5,
+      "measurement_window_days": 30,
+      "attribution_model": "LINEAR"
+    },
+    {
+      "metric_name": "grilling_category_revenue_uplift_pct",
+      "target_value": 12.0,
+      "measurement_window_days": 90,
+      "attribution_model": "LAST_TOUCH"
+    }
+  ],
+  "budget_total_cents": 50000000,
+  "budget_media_cents": 37500000,
+  "budget_production_cents": 7500000,
+  "start_date": "2026-06-01",
+  "end_date": "2026-08-31",
+  "creative_brief_summary": "Create 3 EMAIL send sequences (weeks 1, 4, 8) and a PAID_SOCIAL carousel series targeting active loyalty members in the Southwest. Two creative tracks: (1) Red Meat & BBQ essentials featuring premium cuts with loyalty price callouts, (2) Fresh Seafood & lighter grilling options. All assets must use real food photography (no lifestyle/people-only shots per past lesson). Email sends scheduled Thursday. Each email variant must include a personalized loyalty member savings badge.",
+  "risks": [
+    "Seafood subcategory historically underperforms without dedicated creative — mitigate by building separate asset track",
+    "Paid social CPMs typically spike 20-30% during Memorial Day and 4th of July — monitor daily budget pacing and cap bids at $12 CPM",
+    "Email deliverability risk if batch too large — segment into 4 weekly cohorts for Southwest region sends"
+  ],
+  "rationale": "The Southwest and Pacific divisions have the highest grilling product penetration in the Albertsons network (index 142 vs national) and Vons banner loyalty members show 2.3× higher lifetime value in the meat/seafood category versus non-loyalty shoppers. EMAIL+PAID_SOCIAL channel mix reflects the digital enrollment rate (78%) of target segment and allows precise loyalty member targeting without wasted impressions. 55/45 EMAIL/PAID_SOCIAL split optimizes for low-cost touchpoints first (email CPM ~$1.20) while PAID_SOCIAL drives incremental reach among digital-first members who open email less frequently. Budget of $500K total is appropriate for a 90-day 500-store regional campaign at the target reach of 1.2M households."
+}

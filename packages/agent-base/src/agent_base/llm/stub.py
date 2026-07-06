@@ -14,8 +14,16 @@ from typing import Any
 
 from .client import LlmResponse, LlmUsage, Message, ToolDefinition
 
-# Location of golden-pair fixtures on disk
-FIXTURES_DIR = Path(__file__).parent.parent.parent.parent.parent / "tests" / "fixtures"
+# Location of golden-pair fixtures: packages/agent-base/tests/fixtures
+# Override with AGENT_STUB_FIXTURES_DIR env var for per-project fixture sets
+_DEFAULT_FIXTURES_DIR = Path(__file__).parent.parent.parent.parent / "tests" / "fixtures"
+
+
+def _fixtures_dir() -> Path:
+    override = os.environ.get("AGENT_STUB_FIXTURES_DIR")
+    if override:
+        return Path(override)
+    return _DEFAULT_FIXTURES_DIR
 
 
 def _hash_messages(messages: list[Message]) -> str:
@@ -42,12 +50,13 @@ class StubLlmClient:
         max_tokens: int = 4096,
         temperature: float = 0.0,
     ) -> LlmResponse:
+        fixtures = _fixtures_dir()
         msg_hash = _hash_messages(messages)
 
-        # Try agent-specific fixture first
-        fixture_path = FIXTURES_DIR / f"{self.agent_name}_{msg_hash}.json"
-        if fixture_path.exists():
-            data = json.loads(fixture_path.read_text())
+        # 1. Exact match: {agent_name}_{msg_hash}.json
+        exact_path = fixtures / f"{self.agent_name}_{msg_hash}.json"
+        if exact_path.exists():
+            data = json.loads(exact_path.read_text())
             return LlmResponse(
                 content=data.get("content", ""),
                 tool_calls=data.get("tool_calls", []),
@@ -55,7 +64,18 @@ class StubLlmClient:
                 stop_reason="end_turn",
             )
 
-        # Fallback: generic valid stub response
+        # 2. Agent default: {agent_name}_stub_default.json
+        default_path = fixtures / f"{self.agent_name}_stub_default.json"
+        if default_path.exists():
+            data = json.loads(default_path.read_text())
+            return LlmResponse(
+                content=data.get("content", ""),
+                tool_calls=data.get("tool_calls", []),
+                usage=LlmUsage(input_tokens=100, output_tokens=200),
+                stop_reason="end_turn",
+            )
+
+        # 3. Fallback: generic minimal response
         return self._generic_stub(tools)
 
     def _generic_stub(self, tools: list[ToolDefinition] | None) -> LlmResponse:

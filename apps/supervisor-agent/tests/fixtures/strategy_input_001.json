@@ -1,0 +1,30 @@
+{
+  "campaign_id": "550e8400-e29b-41d4-a716-446655440001",
+  "upstream_outputs": {
+    "campaign_meta": {
+      "name": "Summer Grilling Extravaganza",
+      "brief_text": "Drive incremental basket size among active loyalty members by promoting premium grilling products (beef, pork, seafood, marinades, charcoal) across our top 500 stores in the Southwest and Pacific regions during peak grilling season. Target households with outdoor lifestyle indicators. Budget must be efficient on EMAIL and PAID_SOCIAL channels.",
+      "budget_total_cents": 50000000,
+      "budget_media_cents": 37500000,
+      "budget_production_cents": 7500000,
+      "start_date": "2026-06-01",
+      "end_date": "2026-08-31",
+      "division_id": "div-southwest",
+      "banner_id": "banner-vons"
+    },
+    "past_lessons": [
+      "Summer BBQ campaigns perform 23% better when EMAIL is sent Thursday vs Friday",
+      "Paid social creative featuring real food photos outperforms lifestyle shots by 31% CTR",
+      "Seafood subcategory requires separate creative from red meat for optimal conversion"
+    ]
+  },
+  "config": {
+    "model": "claude-opus-4-8",
+    "critique_model": "claude-haiku-4-5-20251001",
+    "max_iterations": 2,
+    "score_threshold": 3.8,
+    "hard_minimum_score": 2.5,
+    "per_run_token_budget": 20000,
+    "stub_mode": true
+  }
+}

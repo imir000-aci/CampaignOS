@@ -55,6 +55,29 @@ jobs:
         env:
           AGENT_LLM_STUB: "true"
 
+  python-test:
+    name: Python Agent Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install agent-base
+        run: pip install -e packages/agent-base
+
+      - name: Install supervisor-agent
+        run: pip install -e "apps/supervisor-agent[dev]"
+
+      - name: Run agent tests
+        working-directory: apps/supervisor-agent
+        run: pytest tests/ -v
+        env:
+          AGENT_LLM_STUB: "true"
+
   build:
     name: Build
     runs-on: ubuntu-latest
