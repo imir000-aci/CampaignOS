@@ -1,0 +1,28 @@
+{
+  "name": "@campaignos/offer-platform",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit",
+    "db:migrate": "tsx ../../packages/db-client/src/migrate.ts offer"
+  },
+  "dependencies": {
+    "@campaignos/db-client": "*",
+    "@campaignos/kafka-client": "*",
+    "@campaignos/otel": "*",
+    "@campaignos/rbac": "*",
+    "@campaignos/types": "*",
+    "@fastify/cors": "^9.0.1",
+    "@fastify/jwt": "^8.0.1",
+    "fastify": "^4.28.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}
